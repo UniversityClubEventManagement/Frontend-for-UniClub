@@ -23,7 +23,7 @@ export function Register() {
     clubName: "",
   });
 
-  const handleInputChange = (field: string, value: string) => {
+  /*const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -41,6 +41,69 @@ export function Register() {
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+*/
+
+//strong password
+const [error, setError] = useState<string | null>(null);
+const [loading, setLoading] = useState(false);
+
+const passwordPattern =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#_-]).{8,}$/;
+
+const validateStepOne = () => {
+  if (!formData.name.trim()) {
+    return "Full name is required.";
+  }
+
+  if (!formData.email.trim()) {
+    return "Email is required.";
+  }
+
+  if (!formData.password) {
+    return "Password is required.";
+  }
+
+  if (!passwordPattern.test(formData.password)) {
+    return "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.";
+  }
+
+  if (formData.password !== formData.confirmPassword) {
+    return "Password and confirm password do not match.";
+  }
+
+  if (!formData.role) {
+    return "Please select a role.";
+  }
+
+  return null;
+};
+
+const handleInputChange = (field: string, value: string) => {
+  setFormData(prev => ({ ...prev, [field]: value }));
+};
+
+const handleNext = () => {
+  if (step === 1) {
+    const validationError = validateStepOne();
+
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setError(null);
+    setStep(2);
+  }
+};
+
+const handleBack = () => {
+  if (step === 2) {
+    setStep(1);
+  }
+};
+
+//end
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,6 +201,10 @@ export function Register() {
                     onChange={(e) => handleInputChange("password", e.target.value)}
                     required
                   />
+                  <p className="mt-1 text-xs text-[#6B7280]">
+  Password must be at least 8 characters and include uppercase, lowercase,
+  number, and special character.
+</p>
                 </div>
 
                 <div>
