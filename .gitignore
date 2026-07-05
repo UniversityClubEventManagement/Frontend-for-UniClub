@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Backend should not go to frontend repo
+backend/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build output
+dist/
+build/
+
+# Logs
+*.log
+
+# Editor/System files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Extra zip/text files
+src.zip
+New Text Document.txt
