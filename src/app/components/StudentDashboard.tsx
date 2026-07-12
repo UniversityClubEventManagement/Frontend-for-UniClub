@@ -1,4 +1,4 @@
-import { Calendar, Clock, MapPin, Users, Filter, Search, CheckCircle } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Filter, Search, CheckCircle} from "lucide-react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -66,6 +66,16 @@ export function StudentDashboard() {
       alert((error as Error).message || "Unable to update registration");
     }
   };
+//
+const handleLogout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  localStorage.removeItem("authToken");
+  localStorage.removeItem("currentUser");
+
+  navigate("/login", { replace: true });
+};
+//
 
   const filteredEvents = events.filter((event) =>
     event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -78,11 +88,15 @@ export function StudentDashboard() {
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {/* Welcome Section */}
-        <div className="mb-6">
-          <h2 className="text-2xl sm:text-3xl text-[#1E3A8A] mb-2">Welcome, Student</h2>
-          <p className="text-[#6B7280]">Discover and join upcoming club events</p>
-        </div>
+
+{/* Welcome Section */}
+<div className="mb-6">
+  <h2 className="text-2xl sm:text-3xl text-[#1E3A8A] mb-2">Welcome, Student</h2>
+  <p className="text-[#6B7280]">Discover and join upcoming club events</p>
+</div>
+
+
+
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
