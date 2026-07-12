@@ -35,7 +35,7 @@ export function RootLayout() {
                 <Button
                   variant="ghost"
                   className="hidden sm:inline-flex items-center gap-2 text-blue-100 hover:text-white"
-                  onClick={handleLogout}
+                  onClick={logout}
                 >
                   <LogOut className="w-4 h-4" />
                   Logout
