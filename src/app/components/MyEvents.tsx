@@ -1,4 +1,8 @@
-import { Calendar, Clock, MapPin, XCircle, ArrowLeft } from "lucide-react";
+import { Calendar, 
+        Clock, 
+        MapPin, 
+        XCircle, 
+        ArrowLeft } from "lucide-react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
@@ -27,6 +31,7 @@ const mockRegisteredEvents: RegisteredEvent[] = [
     status: "upcoming",
     category: "Social"
   },
+  
   {
     id: 2,
     title: "Photography Workshop",
@@ -37,6 +42,7 @@ const mockRegisteredEvents: RegisteredEvent[] = [
     status: "upcoming",
     category: "Workshop"
   },
+  
   {
     id: 3,
     title: "Coding Competition Finals",
@@ -47,6 +53,7 @@ const mockRegisteredEvents: RegisteredEvent[] = [
     status: "completed",
     category: "Competition"
   },
+  
 ];
 
 export function MyEvents() {
@@ -187,6 +194,7 @@ export function MyEvents() {
           </div>
 
           {/* Mobile Card View */}
+          
           <div className="lg:hidden divide-y divide-[#E5E7EB]">
             {events.map((event) => (
               <div key={event.id} className="p-4">
@@ -213,6 +221,7 @@ export function MyEvents() {
                   <Button 
                     variant="outline" 
                     size="sm" 
+                    
                     className="flex-1 border-[#E5E7EB] text-[#1F2937]"
                     onClick={() => navigate('/event-detail')}
                   >
