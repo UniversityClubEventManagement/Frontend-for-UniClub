@@ -36,6 +36,8 @@ interface ClubSummary {
 
 interface ConflictEvent {
   id: string;
+  event1Id: string;
+  event2Id: string;
   event1: string;
   event2: string;
   location: string;
@@ -149,6 +151,24 @@ export function SystemAdminDashboard() {
     } catch (err) {
       console.error(err);
       setError((err as Error).message || "Unable to update request status");
+    }
+  };
+
+  const handleResolveConflict = async (eventId: string) => {
+    setError(null);
+    setMessage(null);
+
+    try {
+      const response = await apiFetch(`/api/admin/conflicts/${eventId}/resolve`, {
+        method: "POST",
+      });
+
+      setConflicts((prev) => prev.filter((conflict) => conflict.event1Id !== eventId && conflict.event2Id !== eventId));
+      setMessage(response.message || "Conflict resolved successfully.");
+      loadAdminData();
+    } catch (err) {
+      console.error(err);
+      setError((err as Error).message || "Unable to resolve conflict");
     }
   };
 
@@ -495,7 +515,12 @@ export function SystemAdminDashboard() {
                           <p><span className="font-medium text-[#1F2937]">Date:</span> {new Date(conflict.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {conflict.time}</p>
                         </div>
                       </div>
-                      <Button className="bg-[#1E3A8A] hover:bg-[#1E40AF] text-white">Resolve</Button>
+                      <Button
+                        className="bg-[#1E3A8A] hover:bg-[#1E40AF] text-white"
+                        onClick={() => handleResolveConflict(conflict.event1Id)}
+                      >
+                        Resolve
+                      </Button>
                     </div>
                   </div>
                 </Card>
