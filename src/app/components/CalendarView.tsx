@@ -2,29 +2,60 @@ import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from "lucide-reac
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { apiFetch } from "../lib/api";
 
 interface CalendarEvent {
-  id: number;
+  _id: string;
   title: string;
-  club: string;
+  clubName: string;
   date: string;
-  time: string;
-  status: "approved" | "pending" | "conflict";
+  startTime: string;
+  endTime: string;
+  location: string;
+  status: "approved" | "pending" | "rejected";
 }
 
 const mockCalendarEvents: CalendarEvent[] = [
-  { id: 1, title: "Tech Talk: AI Development", club: "CS Club", date: "2026-03-05", time: "18:00", status: "approved" },
-  { id: 2, title: "Spring Networking Mixer", club: "Business Society", date: "2026-03-08", time: "19:00", status: "approved" },
-  { id: 3, title: "Community Service Day", club: "Volunteer Club", date: "2026-03-12", time: "09:00", status: "approved" },
-  { id: 4, title: "Photography Exhibition", club: "Photography Club", date: "2026-03-15", time: "17:00", status: "approved" },
-  { id: 5, title: "Coding Bootcamp", club: "CS Club", date: "2026-03-20", time: "14:00", status: "pending" },
-  { id: 6, title: "Study Session", club: "Math Club", date: "2026-03-20", time: "14:00", status: "conflict" },
+  { _id: "1", title: "Tech Talk: AI Development", clubName: "CS Club", date: "2026-03-05", startTime: "18:00", endTime: "19:00", location: "Main Hall", status: "approved" },
+  { _id: "2", title: "Spring Networking Mixer", clubName: "Business Society", date: "2026-03-08", startTime: "19:00", endTime: "20:30", location: "Auditorium", status: "approved" },
+  { _id: "3", title: "Community Service Day", clubName: "Volunteer Club", date: "2026-03-12", startTime: "09:00", endTime: "12:00", location: "Campus Green", status: "approved" },
+  { _id: "4", title: "Photography Exhibition", clubName: "Photography Club", date: "2026-03-15", startTime: "17:00", endTime: "19:00", location: "Gallery", status: "approved" },
+  { _id: "5", title: "Coding Bootcamp", clubName: "CS Club", date: "2026-03-20", startTime: "14:00", endTime: "16:00", location: "Lab 2", status: "pending" },
+  { _id: "6", title: "Study Session", clubName: "Math Club", date: "2026-03-20", startTime: "14:00", endTime: "15:30", location: "Lab 2", status: "approved" },
 ];
+
+const timeToMinutes = (value: string) => {
+  const [hours, minutes] = value.split(":").map(Number);
+  return hours * 60 + (minutes || 0);
+};
+
+const isOverlapping = (eventA: CalendarEvent, eventB: CalendarEvent) => {
+  if (eventA.date !== eventB.date) return false;
+  const startA = timeToMinutes(eventA.startTime);
+  const endA = timeToMinutes(eventA.endTime);
+  const startB = timeToMinutes(eventB.startTime);
+  const endB = timeToMinutes(eventB.endTime);
+  return startA < endB && startB < endA;
+};
 
 export function CalendarView() {
   const [view, setView] = useState<"month" | "week">("month");
   const [currentDate, setCurrentDate] = useState(new Date(2026, 2, 1)); // March 2026
+  const [events, setEvents] = useState<CalendarEvent[]>(mockCalendarEvents);
+
+  useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        const response = await apiFetch("/api/events");
+        setEvents(response || mockCalendarEvents);
+      } catch {
+        setEvents(mockCalendarEvents);
+      }
+    };
+
+    loadEvents();
+  }, []);
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -41,7 +72,7 @@ export function CalendarView() {
 
   const getEventsForDate = (day: number) => {
     const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    return mockCalendarEvents.filter(event => event.date === dateStr);
+    return events.filter((event) => event.date === dateStr);
   };
 
   const previousMonth = () => {
@@ -66,6 +97,15 @@ export function CalendarView() {
   };
 
   const monthYear = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const conflictList = events.flatMap((event, index) =>
+    events
+      .filter((other, otherIndex) => otherIndex > index && isOverlapping(event, other))
+      .map((other) => ({
+        _id: `${event._id}-${other._id}`,
+        event,
+        other,
+      }))
+  );
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -186,9 +226,9 @@ export function CalendarView() {
                   <div className="space-y-1">
                     {events.map(event => (
                       <div
-                        key={event.id}
+                        key={event._id}
                         className={`text-[10px] sm:text-xs p-1 rounded border-l-2 truncate ${getStatusColor(event.status)}`}
-                        title={`${event.title} - ${event.club}`}
+                        title={`${event.title} - ${event.clubName}`}
                       >
                         <div className="font-medium truncate hidden sm:block">{event.title}</div>
                         <div className="sm:hidden">•</div>
@@ -202,14 +242,43 @@ export function CalendarView() {
         </div>
       </Card>
 
+      <Card className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] mt-6">
+        <div className="p-4 sm:p-6 border-b border-[#E5E7EB]">
+          <h3 className="text-lg font-semibold text-[#1F2937]">Scheduling Conflicts</h3>
+          <p className="text-sm text-[#6B7280] mt-1">Conflicts are highlighted when two events overlap on the same date and time.</p>
+        </div>
+        <div className="divide-y divide-[#E5E7EB]">
+          {conflictList.length === 0 ? (
+            <div className="p-4 sm:p-6 text-sm text-[#6B7280]">No scheduling conflicts detected.</div>
+          ) : (
+            conflictList.map((conflict) => (
+              <div key={conflict._id} className="p-4 sm:p-6 hover:bg-[#F9FAFB] transition-colors">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h4 className="font-medium text-[#1F2937]">{conflict.event.title}</h4>
+                    <p className="text-sm text-[#EF4444] mt-1">Overlaps with {conflict.other.title} on {new Date(conflict.event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                    <div className="flex flex-wrap gap-4 mt-2 text-sm text-[#6B7280]">
+                      <span>{conflict.event.startTime} - {conflict.event.endTime}</span>
+                      <span>{conflict.event.location}</span>
+                      <span>{conflict.event.clubName}</span>
+                    </div>
+                  </div>
+                  <Badge className="bg-[#FEE2E2] text-[#EF4444] border-0">Conflict</Badge>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </Card>
+
       {/* Events List for Selected Day */}
       <Card className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] mt-6">
         <div className="p-4 sm:p-6 border-b border-[#E5E7EB]">
           <h3 className="text-lg font-semibold text-[#1F2937]">Upcoming Events</h3>
         </div>
         <div className="divide-y divide-[#E5E7EB]">
-          {mockCalendarEvents.slice(0, 5).map(event => (
-            <div key={event.id} className="p-4 sm:p-6 hover:bg-[#F9FAFB] transition-colors">
+          {events.slice(0, 5).map(event => (
+            <div key={event._id} className="p-4 sm:p-6 hover:bg-[#F9FAFB] transition-colors">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
