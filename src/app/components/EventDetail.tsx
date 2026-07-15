@@ -1,3 +1,4 @@
+
 import { Calendar, Clock, MapPin, Users, ArrowLeft, CheckCircle, AlertCircle } from "lucide-react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
@@ -197,6 +198,7 @@ export function EventDetail() {
                       <span className="text-[#6B7280]">Available Slots</span>
                       <span className="font-medium text-[#1F2937]">{spotsLeft} spots left</span>
                     </div>
+                    
                     <div className="bg-[#E5E7EB] rounded-full h-3 overflow-hidden">
                       <div
                         className={`h-full transition-all ${
@@ -207,6 +209,7 @@ export function EventDetail() {
                     </div>
                   </div>
                 </Card>
+                
 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Button
@@ -217,6 +220,7 @@ export function EventDetail() {
                     <CheckCircle className="w-5 h-5 mr-2" />
                     {event.isRegistered ? "Cancel Registration" : spotsLeft === 0 ? "Event Full" : "Register for Event"}
                   </Button>
+                  
                   <Button
                     variant="outline"
                     className="border-[#E5E7EB] text-[#1F2937]"
