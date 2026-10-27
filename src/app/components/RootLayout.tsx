@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useNavigate } from "react-router";
-import { GraduationCap, User, Users, Settings, LogOut } from "lucide-react";
+import { GraduationCap, User, Users, Settings, LogOut, IdCard } from "lucide-react";
 import { NotificationsPanel } from "./NotificationsPanel";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "./ui/button";
@@ -16,7 +16,10 @@ export function RootLayout() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="bg-[#1E3A8A] text-white shadow-md sticky top-0 z-50">
+      <header
+        className="bg-[#1E3A8A] text-white shadow-md sticky top-0 z-50"
+        style={{ paddingTop: "env(safe-area-inset-top)" }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -27,37 +30,50 @@ export function RootLayout() {
               </div>
             </div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1 sm:gap-4">
               {/* Notifications */}
               <NotificationsPanel />
 
               {user && (
                 <Button
                   variant="ghost"
-                  className="hidden sm:inline-flex items-center gap-2 text-blue-100 hover:text-white"
+                  className="inline-flex items-center gap-2 px-3 text-blue-100 hover:text-white"
                   onClick={handleLogout}
+                  aria-label="Log out"
                 >
                   <LogOut className="w-4 h-4" />
-                  Logout
+                  <span className="hidden sm:inline">Logout</span>
                 </Button>
               )}
               
               {/* Navigation */}
               <nav className="hidden md:flex items-center gap-1">
                 {user?.role === "student" && (
-                  <NavLink
-                    to="/student"
-                    className={({ isActive }) =>
-                      `flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                        isActive
-                          ? "bg-[#0D9488] text-white"
-                          : "text-blue-100 hover:bg-blue-800"
-                      }`
-                    }
-                  >
-                    <User className="w-4 h-4" />
-                    <span className="hidden lg:inline">Student</span>
-                  </NavLink>
+                  <>
+                    <NavLink
+                      to="/student"
+                      end
+                      className={({ isActive }) =>
+                        `flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                          isActive ? "bg-[#0D9488] text-white" : "text-blue-100 hover:bg-blue-800"
+                        }`
+                      }
+                    >
+                      <User className="w-4 h-4" />
+                      <span className="hidden lg:inline">Student</span>
+                    </NavLink>
+                    <NavLink
+                      to="/student/profile"
+                      className={({ isActive }) =>
+                        `flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                          isActive ? "bg-[#0D9488] text-white" : "text-blue-100 hover:bg-blue-800"
+                        }`
+                      }
+                    >
+                      <IdCard className="w-4 h-4" />
+                      <span className="hidden lg:inline">Profile</span>
+                    </NavLink>
+                  </>
                 )}
                 {user?.role === "club-admin" && (
                   <NavLink
@@ -96,19 +112,31 @@ export function RootLayout() {
           {/* Mobile Navigation */}
           <nav className="md:hidden flex justify-around mt-3 gap-2">
             {user?.role === "student" && (
-              <NavLink
-                to="/student"
-                className={({ isActive }) =>
-                  `flex flex-col items-center gap-1 px-3 py-2 rounded-lg flex-1 transition-colors ${
-                    isActive
-                      ? "bg-[#0D9488] text-white"
-                      : "text-blue-100 hover:bg-blue-800"
-                  }`
-                }
-              >
-                <User className="w-4 h-4" />
-                <span className="text-xs">Student</span>
-              </NavLink>
+              <>
+                <NavLink
+                  to="/student"
+                  end
+                  className={({ isActive }) =>
+                    `flex flex-col items-center gap-1 px-3 py-2 rounded-lg flex-1 transition-colors ${
+                      isActive ? "bg-[#0D9488] text-white" : "text-blue-100 hover:bg-blue-800"
+                    }`
+                  }
+                >
+                  <User className="w-4 h-4" />
+                  <span className="text-xs">Student</span>
+                </NavLink>
+                <NavLink
+                  to="/student/profile"
+                  className={({ isActive }) =>
+                    `flex flex-col items-center gap-1 px-3 py-2 rounded-lg flex-1 transition-colors ${
+                      isActive ? "bg-[#0D9488] text-white" : "text-blue-100 hover:bg-blue-800"
+                    }`
+                  }
+                >
+                  <IdCard className="w-4 h-4" />
+                  <span className="text-xs">Profile</span>
+                </NavLink>
+              </>
             )}
             {user?.role === "club-admin" && (
               <NavLink
@@ -145,7 +173,14 @@ export function RootLayout() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1">
+      <main
+        className="flex-1"
+        style={{
+          paddingLeft: "env(safe-area-inset-left)",
+          paddingRight: "env(safe-area-inset-right)",
+          paddingBottom: "env(safe-area-inset-bottom)",
+        }}
+      >
         <Outlet />
       </main>
     </div>
