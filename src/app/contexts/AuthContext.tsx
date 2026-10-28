@@ -9,6 +9,7 @@ type AuthUser = {
   faculty?: string;
   department?: string;
   academicYear?: string;
+  studentRegistrationNumber?: string;
   clubName?: string;
 };
 
