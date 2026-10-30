@@ -95,10 +95,10 @@ export function SystemAdminDashboard() {
     }
   };
 
-  const loadAdminData = async () => {
+  const loadAdminData = async (clearMessage = true) => {
     setLoading(true);
     setError(null);
-    setMessage(null);
+    if (clearMessage) setMessage(null);
 
     try {
       const [statsResponse, pendingResponse, clubsResponse, conflictsResponse] = await Promise.all([
@@ -165,7 +165,7 @@ export function SystemAdminDashboard() {
 
       setConflicts((prev) => prev.filter((conflict) => conflict.event1Id !== eventId && conflict.event2Id !== eventId));
       setMessage(response.message || "Conflict resolved successfully.");
-      loadAdminData();
+      await loadAdminData(false);
     } catch (err) {
       console.error(err);
       setError((err as Error).message || "Unable to resolve conflict");
@@ -199,7 +199,7 @@ export function SystemAdminDashboard() {
       setAdminEmail("");
       setAdminPassword("");
       setShowCreateClubForm(false);
-      loadAdminData();
+      await loadAdminData(false);
     } catch (err) {
       console.error(err);
       setError((err as Error).message || "Unable to create club");
